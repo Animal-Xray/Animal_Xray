@@ -8,6 +8,7 @@ const Workspace = () => {
   const [selectedWorkspace, setSelectedWorkspace] = useState(null); // 선택된 워크스페이스
   const [photos, setPhotos] = useState([]); // 선택된 워크스페이스의 사진 목록
   const [fileInputs, setFileInputs] = useState({}); // 워크스페이스별 파일 입력 상태 관리
+  const [selectedPhoto, setSelectedPhoto] = useState(null); // 클릭한 사진
   
 
   // 워크스페이스 목록 가져오기
@@ -89,6 +90,27 @@ const Workspace = () => {
     }
   };
 
+  // 워크스페이스 삭제 요청
+	const deleteWorkspace = async (workspaceId) => {
+		const confirmDelete = window.confirm("정말 이 워크스페이스를 삭제하시겠습니까?");
+		if (!confirmDelete) return;
+
+		try {
+			await axios.delete(`http://localhost:8080/api/workspace/${workspaceId}`);
+			alert("워크스페이스가 삭제되었습니다.");
+			// 삭제 후 워크스페이스 목록 갱신
+			fetchWorkspaces();
+		} catch (error) {
+			console.error("워크스페이스 삭제 중 오류 발생:", error);
+			alert("워크스페이스 삭제에 실패했습니다.");
+		}
+	};
+
+  // 사진 클릭 이벤트 핸들러
+  const handlePhotoClick = (photo) => {
+    setSelectedPhoto(photo); // 클릭된 사진 데이터 저장
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h2>워크스페이스 목록</h2>
@@ -115,6 +137,7 @@ const Workspace = () => {
               >
                 선택
               </button>
+			  <button onClick={() => deleteWorkspace(workspace.id)}>삭제</button>
               <div style={{ marginTop: "10px" }}>
                 <input
                   type="file"
@@ -129,13 +152,14 @@ const Workspace = () => {
                 >
                   파일 추가
                 </button>
+				
               </div>
             </div>
           </li>
         ))}
       </ul>
 
-      {selectedWorkspace && (
+      {/* {selectedWorkspace && (
         <div style={{ marginTop: "20px" }}>
           <h3>선택된 워크스페이스의 파일 목록</h3>
           <ul>
@@ -145,6 +169,38 @@ const Workspace = () => {
               </li>
             ))}
           </ul>
+        </div>
+      )} */}
+
+      {selectedWorkspace && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>선택된 워크스페이스의 파일 목록</h3>
+          <ul>
+            {photos.map((photo) => (
+              <li
+                key={photo.id}
+                onClick={() => handlePhotoClick(photo)}
+                style={{
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  color: "blue",
+                }}
+              >
+                {photo.fileName}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {selectedPhoto && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>선택된 사진</h3>
+          <img
+            src={`http://localhost:8080/upload/photos/${selectedPhoto.fileName}`}
+            alt={selectedPhoto.fileName}
+            style={{ maxWidth: "100%", maxHeight: "400px" }}
+          />
         </div>
       )}
     </div>
