@@ -5,6 +5,7 @@ import com.capstone.backend.workspace.model.Workspace;
 import com.capstone.backend.workspace.service.WorkspaceService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,16 +44,22 @@ public class WorkspaceController {
         return ResponseEntity.ok(workspaces);
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(
-            @RequestParam String workspaceName,
-            @RequestParam MultipartFile file
-    ) {
+    /**
+     * 워크스페이스 삭제 API
+     * @param workspaceId 삭제할 워크스페이스 ID
+     * @return 삭제 결과 메시지
+     */
+    @DeleteMapping("/{workspaceId}")
+    public ResponseEntity<String> deleteWorkspace(@PathVariable Long workspaceId) {
         try {
-            workspaceService.saveFile(workspaceName, file.getOriginalFilename(), file.getBytes());
-            return ResponseEntity.ok("파일이 업로드되었습니다.");
+            workspaceService.deleteWorkspace(workspaceId);
+            return ResponseEntity.ok("워크스페이스가 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("삭제 실패: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("파일 업로드 실패: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("서버 오류로 인해 워크스페이스를 삭제할 수 없습니다.");
         }
     }
+
 }
