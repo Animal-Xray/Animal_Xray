@@ -8,15 +8,37 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    // 회원가입 로직 추가
+    // 비밀번호 확인
     if (password !== confirmPassword) {
-      alert("비밀번호가 일치하지 않습니다.");
+      alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    // 회원가입 성공 후 로그인 페이지로 이동
-    navigate('/login');
+
+    // API 요청
+    try {
+      const response = await fetch('http://localhost:8080/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (response.ok) {
+        alert('회원가입 성공!');
+        navigate('/login'); // 회원가입 성공 후 로그인 페이지로 이동
+      } else {
+        const errorData = await response.json();
+        alert(`회원가입 실패: ${errorData.message || '오류가 발생했습니다.'}`);
+      }
+    } catch (error) {
+      alert(`회원가입 중 오류가 발생했습니다: ${error.message}`);
+    }
   };
 
   return (

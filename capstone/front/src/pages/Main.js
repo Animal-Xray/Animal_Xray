@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Dashboard from './Dashboard';
-import ImageList from './ImageList';
-import ResultPage from './resultpage';
+import Dashboard from '../components/Dashboard';
+import ImageList from '../components/ImageList';
+import ResultPage from '../components/resultpage';
 import '../styles/Main.css';
 
 function Main() {
