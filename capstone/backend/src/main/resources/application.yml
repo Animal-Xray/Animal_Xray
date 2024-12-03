@@ -17,3 +17,8 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+
+    servlet:
+      multipart:
+        max-file-size: 10MB  # 업로드 파일 크기 제한
+        max-request-size: 20MB # 요청 전체 크기 제한
