@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
-import '../styles/Login.css';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import '../styles/Login.css';
 
 function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // 로그인 로직 추가
+
+    try {
+      const response = await axios.post("http://localhost:8080/api/login", {
+        email,
+        password,
+      });
+	  console.log(response)
+      setMessage("로그인 성공: " + response.status);
+    } catch (error) {
+      setMessage("로그인 실패: " + error.response?.data?.message || error.message);
+    }
   };
 
   return (
@@ -42,6 +54,7 @@ function Login() {
         <button type="submit" className="login-button">Login</button>
         <button type="button" className="signup-button" onClick={() => navigate('/signup')}>Signup</button>
       </form>
+      {message && <p>{message}</p>}
     </div>
   );
 }

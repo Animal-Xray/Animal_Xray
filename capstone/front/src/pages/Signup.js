@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 import '../styles/Login.css';
 
 function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
@@ -16,28 +18,16 @@ function Signup() {
       return;
     }
 
-    // API 요청
     try {
-      const response = await fetch('http://localhost:8080/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      const response = await axios.post("/api/register", {
+        email,
+        password,
       });
+	  
 
-      if (response.ok) {
-        alert('회원가입 성공!');
-        navigate('/login'); // 회원가입 성공 후 로그인 페이지로 이동
-      } else {
-        const errorData = await response.json();
-        alert(`회원가입 실패: ${errorData.message || '오류가 발생했습니다.'}`);
-      }
+      setMessage("회원가입 성공: " + response.status);
     } catch (error) {
-      alert(`회원가입 중 오류가 발생했습니다: ${error.message}`);
+      setMessage("회원가입 실패: " + error.response?.data?.message || error.message);
     }
   };
 
@@ -79,6 +69,7 @@ function Signup() {
         <button type="submit" className="login-button">Signup</button>
         <button type="button" className="signup-button" onClick={() => navigate('/login')}>Cancel</button>
       </form>
+      {message && <p>{message}</p>}
     </div>
   );
 }
